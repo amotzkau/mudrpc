@@ -49,7 +49,7 @@ picklerpc.server.register("/MUD/rpc/fifo",
     })
 
 # Another example for Perl scripts we have a JSON encoded FIFO:
-jsonrpc.server.register("/UNItopia/mudadm/python/rpc/news/perl",
+jsonrpc.server.register("/MUD/rpc/perl",
     { "mud":  lambda: rpctools.RedirectApp("mud", daemon)
     })
 
