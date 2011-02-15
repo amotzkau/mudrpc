@@ -1,0 +1,20 @@
+MUDRPC
+======
+
+MUDRPC is mainly a set of Python libraries for communicating with an
+LDMud (http://ldmud.eu/). It also consists of LPC programs (written
+for LDMud 3.3) and some scripts that use these libraries.
+
+Current status
+--------------
+The library is in development with an alpha status and currently
+very poorly documented, but already in use in a production MUD.
+
+Repository
+----------
+The source code repository can be found at:
+https://github.com/amotzkau/mudrpc
+
+License
+-------
+MUDRPC is released under 2-clause BSD as given in COPYING.

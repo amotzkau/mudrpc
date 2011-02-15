@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+MUDRPC.egg-info/PKG-INFO
+MUDRPC.egg-info/SOURCES.txt
+MUDRPC.egg-info/dependency_links.txt
+MUDRPC.egg-info/entry_points.txt
+MUDRPC.egg-info/not-zip-safe
+MUDRPC.egg-info/top_level.txt
+mudrpc/__init__.py

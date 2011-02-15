@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+RPCTools.egg-info/PKG-INFO
+RPCTools.egg-info/SOURCES.txt
+RPCTools.egg-info/dependency_links.txt
+RPCTools.egg-info/entry_points.txt
+RPCTools.egg-info/not-zip-safe
+RPCTools.egg-info/top_level.txt
+rpctools/__init__.py

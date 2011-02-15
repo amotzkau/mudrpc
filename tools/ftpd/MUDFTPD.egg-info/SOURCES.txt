@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+MUDFTPD.egg-info/PKG-INFO
+MUDFTPD.egg-info/SOURCES.txt
+MUDFTPD.egg-info/dependency_links.txt
+MUDFTPD.egg-info/entry_points.txt
+MUDFTPD.egg-info/top_level.txt
+MUDFTPD.egg-info/zip-safe
+mudftpd/__init__.py

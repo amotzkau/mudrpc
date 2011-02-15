@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+PickleRPC.egg-info/PKG-INFO
+PickleRPC.egg-info/SOURCES.txt
+PickleRPC.egg-info/dependency_links.txt
+PickleRPC.egg-info/entry_points.txt
+PickleRPC.egg-info/not-zip-safe
+PickleRPC.egg-info/top_level.txt
+picklerpc/__init__.py

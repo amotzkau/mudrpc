@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+RPCBase.egg-info/PKG-INFO
+RPCBase.egg-info/SOURCES.txt
+RPCBase.egg-info/dependency_links.txt
+RPCBase.egg-info/entry_points.txt
+RPCBase.egg-info/not-zip-safe
+RPCBase.egg-info/top_level.txt
+rpcbase/__init__.py

@@ -1,0 +1,143 @@
+Der RPC-Mechanismus von UNItopia
+================================
+
+1. Einleitung
+-------------
+
+Der RPC-Mechanismus erlaubt es, freigegebene Funktionen in fremden
+Programmen ueber spezielle Kommunikationskanaele aufzurufen.
+
+Alle Kommunikationskanaele laufen prinzipiell in beide Richtungen.
+Jeder Kommunikationsendpunkt kann also sowohl RPC-Anfragen absetzen
+wie auch beantworten. Ein Funktionsaufruf besteht aus einem
+(internen) eindeutigem Identifer, dem Namen der Anwendung,
+dem Namen der Funktion und seinen Parametern.
+
+
+2. Komponenten
+--------------
+
+Ein RPC-Endpunkt besteht aus 6 Komponenten:
+
+ - Das Socketobjekt.
+   Dieses Objekt kuemmert sich um das tatsaechliche Versenden
+   der Daten ueber das Netzwerk. Folgende Objekte sind vorhanden:
+
+    * rpcbase.unix.Server:  Ein Server (sprich, er wartet auf Verbindungen)
+                            fuer Unix-Sockets (FIFOs).
+
+    * rpcbase.unix.Client:  Ein Client, welcher eine Verbindung zu einem
+                            Unix-Socket aufbaut.
+
+    * mudrpc.tcp.Client:    Ein Client, welcher eine Verbindung via TCP
+                            in ein MUD aufbaut.
+
+    * mudrpc.udp.Client:    Ein Client, welcher die Dateien als UDP-Pakete
+                            in ein MUD schickt.
+
+ - Die Kodierung.
+   Die Kodierung wandelt Python-Datentypen (unterstuetzt werden
+   dict, list, str, int und None) in einen String um, der ueber das
+   Netzwerk gesendet werden kann. Folgende Kodierungen sind vorhanden:
+
+    * picklerpc.encoding.PickleEncoding:
+                            Serialisierung ueber pickle(). Unterstuetzt
+                            fast alle Python-Datentypen und ist fuer die
+                            Uebertragung zwischen zwei Python-Prozessen
+                            gedacht.
+
+    * jsonrpc.encoding.JSONEncoding:
+                            Kodierung via JavaScript Object Notation.
+                            Dies ist vor allem zur Kommunikation mit Perl
+                            und anderen Skriptsprachen gedacht.
+
+    * mudrpc.encoding.LPCEncoding:
+                            Kodierung im LPC-save_value()-Format.
+                            Zur Kommunikation mit einem MUD.
+
+ - Die Server-Applikationen:
+   Wenn der Kommunikationspartner eine Funktion in diesem Endpunkt
+   aufrufen will, so muss vorher ein Dictionary mit allen
+   verfuegbaren Applikation registriert worden sein. Dieses
+   Dictionary weist jedem Anwendungsnamen eine Funktion zu,
+   welche nach einem Aufruf ein Objekt zurueckliefert, in welchem
+   dann die eigentliche Funktion aufgerufen werden kann.
+
+ - Der RPC-Handler:
+   Ein Objekt der Klasse rpcbase.handler.RPCHandler ist die
+   Zentrale, welche alle obigen Komponenten miteinander verbindet.
+   Zum Aufruf von RPC-Funktionen stellt es die Funktion
+      call(callback, value)
+   zur Verfuegung, wobei value das Format
+      [ "Anwendung", "Funktion", Parameter... ]
+   hat. callback ist eine Funktion, welche im Erfolgsfalle
+   mit True, Rueckgabewert aufgerufen wird und im Fehlerfalle
+   mit False, Fehlermeldung.
+
+ - Hilfsklassen:
+   Es gibt Hilfsklassen, um die Benutzung des RPC-Handlers
+   zu vereinfachen:
+
+    * rpctools.RedirectApp: Diese Klasse lenkt Funktionsaufrufe auf
+                            einen RPC-Handler um. Alle Funktionen
+                            erwarten als erstes ein Callback-Parameter.
+
+    * rpctools.CallbackHelper:
+                            Eine Server-Applikation kann diese Klasse
+                            erben, um den Callback-Parameter verschwinden
+                            zu lassen. Am Ende einer Funktion wird er
+                            dann automatisch mit dem Funktionsergebnis
+                            aufgerufen.
+
+    * rpctools.CallbackRedirectApp:
+                            Leitet alle Funktionsaufrufe auf eine andere
+                            Klasse um. Der Callback-Parameter wird dabei
+                            nicht weitergegeben, sondern mit dem Funktions-
+                            ergebnis aufgerufen.
+
+    * rpctools.WaitingClient:
+                            Diese Klasse leitet alle Funktionsaufrufe auf
+                            einen RPC-Handler um und wartet auf das Ergebnis.
+
+ - Der Loop-Funktion.
+   Ein Server-Programm muss rpcbase.connection.loop() aufrufen.
+   Es uebernimmt die Behandlung der Sockets und Verarbeitung der ankommenden
+   und abgehenden Pakete.
+
+
+3. Anwendung
+------------
+
+Aus den obigen Komponenten werden fertige Kombination zur einfachen Anwendung
+zur Verfuegung gestellt. Die meisten Client-Funktionen gibt's in synchroner
+(d.h. blockierende) und asynchroner Ausfuehrung (also mit einer Callback-Funktion).
+
+ - Unix-Socket mit Pickle-Kodierung (Python-Python)
+
+       picklerpc.server.register("Dateiname",
+           { "app": lambda: App() })
+
+       ob = picklerpc.client.synconnect("Dateiname", "app")
+       ob.fun()
+
+       ob = picklerpc.client.asynconnect("Dateiname", "app")
+       ob.fun(callback)
+
+ - Unix-Socket mit JSON-Kodierung (Python-Perl)
+   Wie oben, nur mit jsonrpc statt picklerpc.
+
+ - TCP-Verbindung mit LPC-Save-Value-Kodierung (Python-MUD)
+
+       ob = mudrpc.client.syntcpconnect(3333, "app")
+       ob.fun()
+
+       ob = mudrpc.client.asyntcpconnect(3333, "app")
+       ob.fun(callback)
+
+ - UDP-Verbindung mit LPC-Save-Value-Kodierung (Python-MUD)
+
+       ob = mudrpc.client.synudpconnect(3335, "app")
+       ob.fun()
+
+       ob = mudrpc.client.asynudpconnect(3335, "app")
+       ob.fun(callback)
