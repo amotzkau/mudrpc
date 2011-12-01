@@ -4,9 +4,9 @@ def UnixServer(encoding):
     from rpcbase.unix import Server
     from rpctools import WaitingClient
 
-    def register(filename, apps):
+    def register(filename, apps, map = None):
         handler = RPCHandlerCreator(encoding, apps)
-        server = Server(filename, handler)
+        server = Server(filename, handler, map = map)
     return register
 
 from rpcbase.unix import loop

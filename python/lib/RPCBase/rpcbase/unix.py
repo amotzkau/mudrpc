@@ -7,10 +7,11 @@ import traceback
 import connection
 
 class Server(asyncore.dispatcher):
-    def __init__ (self, name, handlercreator):
+    def __init__ (self, name, handlercreator, map = None):
         self.name = name
         self.handlercreator = handlercreator
-        asyncore.dispatcher.__init__ (self)
+        self.map = map
+        asyncore.dispatcher.__init__ (self, map = map)
 
         if os.access(name,os.F_OK):
             os.remove(name)
@@ -24,7 +25,7 @@ class Server(asyncore.dispatcher):
 
     def handle_accept(self):
         conn, addr = self.accept()
-        connection.Connection(self.handlercreator(addr), conn)
+        connection.Connection(self.handlercreator(addr), conn, self.map)
 
 class Client(connection.Client):
     def __init__(self, name, handler, ondemand = False, map = None):
