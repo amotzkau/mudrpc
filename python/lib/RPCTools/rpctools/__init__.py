@@ -58,7 +58,7 @@ class CallbackRedirectApp:
     def __getattr__(self, fun):
         if not fun.startswith("_"):
             def call(cb, *arg):
-                cb(True, self.app.__getattr__(fun)(*arg))
+                cb(True, getattr(self.app, fun)(*arg))
             return call
         else:
             raise AttributeError, fun
