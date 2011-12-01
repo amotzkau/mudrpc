@@ -141,3 +141,28 @@ zur Verfuegung gestellt. Die meisten Client-Funktionen gibt's in synchroner
 
        ob = mudrpc.client.asynudpconnect(3335, "app")
        ob.fun(callback)
+
+
+4. Gleichzeitigkeit
+-------------------
+
+Die RPC-Klassen sind nicht nicht threadsicher. Intern wird die asyncore-
+Bibliothek von Python verwendet. Es spricht nichts dagegen, dass RPC-
+Verbindungen mit anderen asyncore-Verbindungen koexistieren, solange
+alle Verbindungen von einem Thread verwaltet werden. Moechte man die
+Verbindungen threadaessig trennen, so kann man bei Servern der
+register()-Funktion und bei Clients den asynchronen connect()-Funktionen
+einen zusaetzlichen map-Parameter (ein leeres dict) uebergeben.
+Dieser Parameter muss dann auch der loop()-Funktion uebergeben werden.
+Synchrone Client-Funktionen haben generell ihr eigenes map-Objekt
+und arbeiten somit getrennt von allen anderen Verbindungen.
+
+Weil RPC-Funktionen nur mit einem Thread arbeiten, sollte auch eine Anfrage
+bei einem RPC-Server nicht blockieren. Daher erhalten alle aufgerufenen
+Funktionen als ersten Parameter eine Callback-Funktion, erst danach folgen
+die originalen Parameter aus der Anfrage. Die Callback-Funktion muss aufgerufen
+werden, wenn das Ergebnis feststeht. Bei Erfolg wird als 1. Parameter True und
+als 2. Parameter das Ergebnis uebergeben, bei Fehler als 1. Parameter False
+und danach die Fehlermeldung. So ist es moeglich, die Anfrage ruhen zu lassen,
+waehrend man auf das Ergebnis einer zweiten Funktion wartet, wobei die
+RPC-Verarbeitung aber weiterlaeuft.
