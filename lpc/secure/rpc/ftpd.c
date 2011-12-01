@@ -38,8 +38,8 @@ static int check_permission(string wiz, string perm, string path)
     }
     else if(perm == "r")
         return MASTER_OB->valid_read(path, wiz, "read_file", 0);
-    else if((idx=member("adftmn", perm[0])) >= 0)
-        return MASTER_OB->valid_write(path, wiz, ({"write_file", "remove_file", "rename_from", "rename_to", "mkdir", "rmdir"})[idx], 0);
+    else if((idx=member("wadftmn", perm[0])) >= 0)
+        return MASTER_OB->valid_write(path, wiz, ({"write_file", "write_file", "remove_file", "rename_from", "rename_to", "mkdir", "rmdir"})[idx], 0);
     else
         return 0;
 }
