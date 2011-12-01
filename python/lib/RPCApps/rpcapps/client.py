@@ -17,9 +17,9 @@ def AsyncUnixClient(encoding):
     from rpcbase.unix import Client
     from rpctools import RedirectApp
 
-    def connect(filename, name, ondemand = False):
+    def connect(filename, name, ondemand = False, map=None):
         handler = RPCHandler(encoding)
-        client = Client(filename, handler, ondemand)
+        client = Client(filename, handler, ondemand, map=map)
         return RedirectApp(name, handler)
     return connect
 
