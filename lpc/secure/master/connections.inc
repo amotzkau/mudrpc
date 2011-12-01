@@ -15,8 +15,12 @@
 // When using TCP connections:
 protected object connect()
 {
-    if(efun::query_mud_port() == 33033 && efun::query_ip_number()=="127.0.0.1")
-	return clone_object(RPC_CONNECTION);
+    if(efun::query_mud_port() == 33033)
+    {
+        string ip = efun::query_ip_number();
+        if(member(({"127.0.0.1", "::1", "::ffff:127.0.0.1"}), ip) >= 0)
+            return clone_object(RPC_CONNECTION);
+    }
 
     return clone_object(LOGIN_OB);
 }
