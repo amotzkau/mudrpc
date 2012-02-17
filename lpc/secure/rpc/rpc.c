@@ -20,7 +20,11 @@ mapping state = ([:2]);
 #define S_MSG	0
 #define S_TIME	1
 
-mapping requests = ([:2]); // ID -> Callback
+mapping requests = ([:3]); // ID -> Callback on success, on error, call time
+#define REQ_CB_SUCCESS  0
+#define REQ_CB_ERROR    1
+#define REQ_STARTTIME   2
+
 mapping apps = ([
     "mud":	"/secure/rpc/app",
     "control":	"/secure/rpc/rpc",
@@ -58,7 +62,7 @@ private void exec_msg(string msg, closure callback)
 	case RPC_ANSWER:
 	    if(member(requests, val[1]))
 	    {
-		closure cb = requests[val[1]];
+		closure cb = requests[val[1], REQ_CB_SUCCESS];
 		m_delete(requests, val[1]);
 		funcall(cb, val[2]);
 	    }
@@ -66,9 +70,13 @@ private void exec_msg(string msg, closure callback)
 	
 	case RPC_FAIL:
 	{
-	    closure cb = requests[val[1]];
+	    closure cb = requests[val[1], REQ_CB_SUCCESS];
+	    closure cbe = requests[val[1], REQ_CB_ERROR];
 	    m_delete(requests, val[1]);
-	    do_my_error(sprintf("RPC failure: %s\nCallback: %Q\n", val[2], cb));
+	    if(!cbe)
+	        do_my_error(sprintf("RPC failure: %s\nCallback: %Q\n", val[2], cb));
+	    else
+	        funcall(cbe, val[2]);
 	    break;
 	}
 	
@@ -165,10 +173,10 @@ void receive_tcp(string msg)
 protected void reset()
 {
     state = filter(state, (: $2[S_TIME] > $3 :), time()-10);
-    requests = filter(requests, (: $2[1] > $3 :), time()-3600); // One hour at most.
+    requests = filter(requests, (: $2[REQ_STARTTIME] > $3 :), time()-3600); // One hour at most.
 }
 
-void daemon_call(closure cb, string app, string func, varargs mixed* args)
+void daemon_call(closure cb, closure onerr, string app, string func, varargs mixed* args)
 {
     string id;
     
@@ -186,7 +194,7 @@ void daemon_call(closure cb, string app, string func, varargs mixed* args)
     id = get_unique_string();
     daemon->send_tcp(explode(save_value(({RPC_REQUEST, 
 	id, app, func }) + args),"\n")[1]);
-    m_add(requests, id, cb, time());
+    m_add(requests, id, cb, onerr, time());
 }
 
 int remove()
