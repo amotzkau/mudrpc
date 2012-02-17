@@ -29,6 +29,7 @@ mapping apps = ([
     "mud":	"/secure/rpc/app",
     "control":	"/secure/rpc/rpc",
     "ftpd":	"/secure/rpc/ftpd",
+    "mail":	"/secure/rpc/mail",
     ]);
 
 object daemon;

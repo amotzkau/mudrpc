@@ -12,6 +12,8 @@ import picklerpc.client
 import jsonrpc.server
 import socket
 
+from mudmail.mailapp import InternalMail
+
 # An example app:
 class App(rpctools.CallbackHelper):
     def __init__(self):
@@ -32,7 +34,9 @@ class App(rpctools.CallbackHelper):
 daemon = mudrpc.client.tcpconnect(33033,
     # Here we define all the applications that can be
     # called from the MUD.
-    { "app":    App,
+    {
+        "app":    App,
+        "mail":   InternalMail,
     },
     # This function is called upon a successfull connection.
     # We call control::register_daemon in the MUD.
@@ -40,12 +44,14 @@ daemon = mudrpc.client.tcpconnect(33033,
 
 oldumask = os.umask(007)
 
-# A connection for the ftpd: We relay its requests into the MUD
-# so it doesn't have to keep an own connection into it.
+# A connection for the ftpd and other python tools:
+# We relay its requests into the MUD so it doesn't
+# have to keep an own connection into it.
 picklerpc.server.register("/MUD/rpc/fifo",
-    # These two applications can be called in that FIFO (from ftpd).
-    { "mud": lambda: rpctools.RedirectApp("mud", daemon),
-      "ftpd": lambda: rpctools.RedirectApp("ftpd", daemon)
+    # These applications can be called in that FIFO (from ftpd & Co.).
+    { "mud":  lambda: rpctools.RedirectApp("mud", daemon),
+      "ftpd": lambda: rpctools.RedirectApp("ftpd", daemon),
+      "mail": lambda: rpctools.RedirectApp("mail", daemon)
     })
 
 # Another example for Perl scripts we have a JSON encoded FIFO:

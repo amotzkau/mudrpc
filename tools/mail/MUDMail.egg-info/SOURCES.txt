@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+MUDMail.egg-info/PKG-INFO
+MUDMail.egg-info/SOURCES.txt
+MUDMail.egg-info/dependency_links.txt
+MUDMail.egg-info/entry_points.txt
+MUDMail.egg-info/not-zip-safe
+MUDMail.egg-info/top_level.txt
+mudmail/__init__.py

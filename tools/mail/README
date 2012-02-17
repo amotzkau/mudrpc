@@ -1,0 +1,36 @@
+Email Gateway
+=============
+
+Receiving Emails
+----------------
+
+The script mudmail/recmail.py can be called from an MTA. An Exim4 transport
+rule would look like this:
+
+    mud_transport:
+        driver = pipe
+        user = mud
+        group = mud
+        message_size_limit = 25000
+        command = /MUD/mudrpc/tools/mail/mudmail/recmail.py
+        log_fail_output = true
+        return_fail_output = true
+        umask = 027
+
+It excepts the email on stdin, the environment variable LOCAL_PART should
+contain the local part of the recipient (the name before @hostname) and
+SENDER should contain the full sender's name.
+
+The method filter_spam() can be adapted to determine whether it's okay the
+check a user's mails for spam.
+
+On the LPC side /secure/rpc/mail.c (in the mudrpc/lpc directory) gets it's
+receivemail() function called 
+
+
+Sending Emails
+--------------
+
+To send an email cal "/secure/rpc/mail"->sendmail(). The call is forwarded
+to mudmail/mailapp.py. There some header entries are added and the mail
+is sent to the local MTA.
