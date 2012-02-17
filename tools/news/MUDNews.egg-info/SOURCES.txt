@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+MUDNews.egg-info/PKG-INFO
+MUDNews.egg-info/SOURCES.txt
+MUDNews.egg-info/dependency_links.txt
+MUDNews.egg-info/entry_points.txt
+MUDNews.egg-info/not-zip-safe
+MUDNews.egg-info/top_level.txt
+mudnews/__init__.py

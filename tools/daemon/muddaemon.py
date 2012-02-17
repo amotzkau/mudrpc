@@ -13,6 +13,7 @@ import jsonrpc.server
 import socket
 
 from mudmail.mailapp import InternalMail
+from mudnews.newsapp import InternalNews, ExternalNews
 
 # An example app:
 class App(rpctools.CallbackHelper):
@@ -37,6 +38,7 @@ daemon = mudrpc.client.tcpconnect(33033,
     {
         "app":    App,
         "mail":   InternalMail,
+        "news":   InternalNews,
     },
     # This function is called upon a successfull connection.
     # We call control::register_daemon in the MUD.
@@ -51,12 +53,18 @@ picklerpc.server.register("/MUD/rpc/fifo",
     # These applications can be called in that FIFO (from ftpd & Co.).
     { "mud":  lambda: rpctools.RedirectApp("mud", daemon),
       "ftpd": lambda: rpctools.RedirectApp("ftpd", daemon),
-      "mail": lambda: rpctools.RedirectApp("mail", daemon)
+      "mail": lambda: rpctools.RedirectApp("mail", daemon),
+    })
+
+# A special service for the usenet scripts.
+picklerpc.server.register("/MUD/rpc/news",
+    { "news": lambda: ExternalNews(rpctools.RedirectApp("news",daemon))
     })
 
 # Another example for Perl scripts we have a JSON encoded FIFO:
 jsonrpc.server.register("/MUD/rpc/perl",
-    { "mud":  lambda: rpctools.RedirectApp("mud", daemon)
+    { "mud":  lambda: rpctools.RedirectApp("mud", daemon),
+      "news": lambda: rpctools.RedirectApp("news", daemon),
     })
 
 os.umask(oldumask)

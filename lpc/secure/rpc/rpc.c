@@ -30,6 +30,7 @@ mapping apps = ([
     "control":	"/secure/rpc/rpc",
     "ftpd":	"/secure/rpc/ftpd",
     "mail":	"/secure/rpc/mail",
+    "news":	"/secure/rpc/news",
     ]);
 
 object daemon;

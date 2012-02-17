@@ -1,0 +1,70 @@
+Usenet Gateway
+==============
+
+These scripts are designed for use with the INN2 usenet server.
+So you need a working INN2 setup  INN2 should have been compiled
+with perl support.
+
+
+Authorizing MUD users
+---------------------
+
+To your /etc/news/readers.conf add the following lines:
+
+    auth "everyone" {
+        perl_auth:   /MUD/mudrpc/tools/news/perl/inn_auth.pl
+        perl_access: /MUD/mudrpc/tools/news/perl/inn_access.pl
+    }
+
+inn_auth.pl will check the username/password, inn_access.pl
+asks get_newsgroups() in /secure/rpc/news (in the /mudrpc/lpc
+directory) for the newsgroups the user is allowed to read and write.
+
+
+Accepting posts from MUD users
+-------------------------------
+
+perl/filter_nnrpd.pl is a filter script that should be put into
+/etc/news/filter (or whatever filterpath is configured in /etc/news/inn.conf),
+which changes the sender name to the authenticated user, and adds
+a few header entries (X-Muduser and X-Mud) to the post.
+
+
+Receiving Usenet posts
+----------------------
+
+Add the following entries to /etc/news/newsfeeds to call some python scripts
+upon the arrival of posts:
+
+    mud!/mud-news\
+        :!*,mud.*,de.alt.mud\
+        :Tc,Acp,Wn:/MUD/mudrpc/tools/news/mudnews/newsclient.py
+
+    mudcancel!\
+        :!*,control.cancel\
+        :Tc,AC,Wn:/MUD/mudrpc/tools/news/mudnews/cancelclient.py
+
+"mud-news" should be renamed to something unique for your MUD.
+It's the 'Path' entry for outgoing posts. mud.* and de.alt.mud
+are the newsgroups that will be relayed into the MUD. Modify
+it according to your needs.
+
+Both python scripts are very lightweight, the just relay the call to
+the main daemon (/mudrpc/tools/daemon/muddaemon), which in this
+case does not relay the call into the MUD but executes some code
+itself and calling then functions in the MUD with the result.
+The RPC FIFO (/MUD/rpc/news in the example) should be accessible
+to both the news (inn2) and the daemon user.
+
+In the MUD finally /secure/rpc/news->importnews() and cancelnews()
+is called.
+
+
+Sending Usenet posts
+--------------------
+
+To send an email call "/secure/rpc/news"->exportnews() (deletenews() for
+cancelling a post). The call is forwarded to mudnews/newsapp.y
+(class InternalNews). There you can adapt the added header entries
+to your needs. The "Path" entry should be the same as is excluded
+in the newsfeeds entry (see above in 'Receiving Usenet posts').
