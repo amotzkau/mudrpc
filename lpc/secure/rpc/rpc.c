@@ -155,7 +155,7 @@ private void send_udp(string msg, int port)
 
 void receive_udp(string host, string msg, int port)
 {
-    if(host != "127.0.0.1" || object_name(previous_object())!=__MASTER_OBJECT__)
+    if(member(({"127.0.0.1", "::1", "::ffff:127.0.0.1"}), host) < 0 || object_name(previous_object())!=__MASTER_OBJECT__)
 	return;
 
     handle_msg(msg[3..<2], port, lambda(({'msg}),({#'send_udp,'msg, port})));
