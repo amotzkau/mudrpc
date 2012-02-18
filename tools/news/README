@@ -2,7 +2,7 @@ Usenet Gateway
 ==============
 
 These scripts are designed for use with the INN2 usenet server.
-So you need a working INN2 setup  INN2 should have been compiled
+So you need a working INN2 setup. INN2 should have been compiled
 with perl support.
 
 
@@ -49,10 +49,10 @@ It's the 'Path' entry for outgoing posts. mud.* and de.alt.mud
 are the newsgroups that will be relayed into the MUD. Modify
 it according to your needs.
 
-Both python scripts are very lightweight, the just relay the call to
-the main daemon (/mudrpc/tools/daemon/muddaemon), which in this
-case does not relay the call into the MUD but executes some code
-itself and calling then functions in the MUD with the result.
+Both python scripts are very lightweight, they just relay the call
+to the main daemon (/mudrpc/tools/daemon/muddaemon), which in this
+case does not relay the call into the MUD but does some processing
+itself and calls the corresponding functions in the MUD afterwards.
 The RPC FIFO (/MUD/rpc/news in the example) should be accessible
 to both the news (inn2) and the daemon user.
 
@@ -64,7 +64,7 @@ Sending Usenet posts
 --------------------
 
 To send an email call "/secure/rpc/news"->exportnews() (deletenews() for
-cancelling a post). The call is forwarded to mudnews/newsapp.y
+cancelling a post). The call is forwarded to mudnews/newsapp.py
 (class InternalNews). There you can adapt the added header entries
 to your needs. The "Path" entry should be the same as is excluded
 in the newsfeeds entry (see above in 'Receiving Usenet posts').
